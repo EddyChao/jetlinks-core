@@ -223,4 +223,41 @@ public class CommandMetadataResolverTest {
 
     }
 
+    public static class Test3Command extends Test1Command {
+
+        @Schema(description = "Str")
+        @Selector(type = "device")
+        public String getStr() {
+            return super.getStr();
+        }
+
+        @Schema(description = "Index")
+        public Integer getIndex() {
+            return super.getIndex();
+        }
+
+    }
+
+    public static class Test4Command extends Test3Command {
+
+        @Schema(description = "Str", hidden = true)
+        @Selector(type = "device")
+        public String getStr() {
+            return getOrNull("str", String.class);
+        }
+
+        @Schema(description = "Index")
+        public Integer getIndex() {
+            return getOrNull("index", Integer.class);
+        }
+
+    }
+
+    @Test
+    public void testHiddenParentMethod() {
+        FunctionMetadata resolve = CommandMetadataResolver.resolve(Test4Command.class);
+        assertEquals(1, resolve.getInputs().size());
+        assertEquals("index", resolve.getInputs().get(0).getId());
+    }
+
 }
